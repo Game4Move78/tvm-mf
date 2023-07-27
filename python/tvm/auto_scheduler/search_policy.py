@@ -118,6 +118,26 @@ class SearchPolicy(Object):
         """
         return _ffi_api.SearchPolicyContinueSearchOneRound(self, num_measure, measurer)
 
+    def measure_candidates(self, inputs, measurer):
+        """
+        Continue the search by doing an additional search round.
+
+        Parameters
+        ----------
+        num_measure: int
+            The number of programs to measure in this round
+        measurer: ProgramMeasurer
+            The program measurer to measure programs
+
+        Returns
+        -------
+        inputs: List[MeasureInput]
+            The inputs of measurments in this search round
+        results: List[MeasureResult]
+            The results of measurments in this search round
+        """
+        return _ffi_api.MeasureCandidates(self, inputs, measurer)
+
     def set_verbose(self, verbose):
         """
         Set the verbosity level of the search policy.

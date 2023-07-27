@@ -163,6 +163,15 @@ class SearchPolicyNode : public Object {
       int num_measure, ProgramMeasurer measurer) = 0;
 
   /*!
+   * \brief Continue the search by doing an additional search round.
+   * \param num_measure The number of measurements
+   * \param measurer The measurer to measure programs
+   * \return The measurement records for measurements in this search round
+   */
+  virtual std::pair<Array<MeasureInput>, Array<MeasureResult>> MeasureCandidates(
+      Array<MeasureInput> inputs, ProgramMeasurer measurer) = 0;
+
+  /*!
    * \brief Preload measured states from a log file to resume the state of the search policy.
    * \param log_file The name of the record log file.
    */

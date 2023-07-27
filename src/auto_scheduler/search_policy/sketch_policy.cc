@@ -281,6 +281,31 @@ std::pair<Array<MeasureInput>, Array<MeasureResult>> SketchPolicyNode::ContinueS
   return std::make_pair(std::move(inputs), std::move(results));
 }
 
+std::pair<Array<MeasureInput>, Array<MeasureResult>> SketchPolicyNode::MeasureCandidates(
+    Array<MeasureInput> inputs, ProgramMeasurer measurer) {
+  num_measure_per_iter_ = inputs.size();
+
+  // Measure candidate states
+  PrintTitle("Measure", verbose);
+  results = measurer->Measure(search_task, GetRef<SearchPolicy>(this), inputs);
+
+  // Update measured states throughputs. These states will join the EvolutionarySearch in later
+  // search rounds.
+  for (const auto& res : results) {
+    measured_states_throughputs_.push_back(1.0 / FloatArrayMean(res->costs));
+  }
+
+  auto t_begin = std::chrono::high_resolution_clock::now();
+
+  // Update the cost model
+  PrintTitle("Train cost model", verbose);
+  program_cost_model->Update(inputs, results);
+
+  PrintTimeElapsed(t_begin, "training", verbose);
+
+  return std::make_pair(std::move(inputs), std::move(results));
+}
+
 Array<State> SketchPolicyNode::SearchOneRound(int num_random_states, Array<State>* random_states) {
   // Get parameters
   int population = GetIntParam(params, SketchParamKey::EvolutionarySearch::population);
