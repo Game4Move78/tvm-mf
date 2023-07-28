@@ -136,7 +136,7 @@ class SearchPolicy(Object):
         results: List[MeasureResult]
             The results of measurments in this search round
         """
-        return _ffi_api.MeasureCandidates(self, inputs, measurer)
+        return _ffi_api.SearchPolicyMeasureCandidates(self, inputs, measurer)
 
     def set_verbose(self, verbose):
         """
