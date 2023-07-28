@@ -112,8 +112,8 @@ TVM_REGISTER_GLOBAL("auto_scheduler.SearchPolicyContinueSearchOneRound")
 
 TVM_REGISTER_GLOBAL("auto_scheduler.SearchPolicyMeasureCandidates")
     .set_body_typed([](SearchPolicy policy, Array<MeasureInput> inputs, ProgramMeasurer measurer) {
-      auto [inputs, results] = policy->MeasureCandidates(inputs, measurer);
-      return Array<ObjectRef>{inputs, results};
+      auto [inp, res] = policy->MeasureCandidates(inputs, measurer);
+      return Array<ObjectRef>{inp, res};
     });
 
 TVM_REGISTER_GLOBAL("auto_scheduler.SearchPolicySetVerbose")

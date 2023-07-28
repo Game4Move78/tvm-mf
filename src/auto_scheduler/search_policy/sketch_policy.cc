@@ -284,6 +284,7 @@ std::pair<Array<MeasureInput>, Array<MeasureResult>> SketchPolicyNode::ContinueS
 std::pair<Array<MeasureInput>, Array<MeasureResult>> SketchPolicyNode::MeasureCandidates(
     Array<MeasureInput> inputs, ProgramMeasurer measurer) {
   num_measure_per_iter_ = inputs.size();
+  Array<MeasureResult> results;
 
   // Measure candidate states
   PrintTitle("Measure", verbose);

@@ -106,6 +106,17 @@ std::pair<Array<MeasureInput>, Array<MeasureResult>> EmptyPolicyNode::ContinueSe
   return std::make_pair(std::move(inputs), std::move(results));
 }
 
+std::pair<Array<MeasureInput>, Array<MeasureResult>> EmptyPolicyNode::MeasureCandidates(
+    Array<MeasureInput> inputs, ProgramMeasurer measurer) {
+  Array<MeasureResult> results;
+
+  // Measure these states
+  PrintTitle("Measure", verbose);
+  results = measurer->Measure(search_task, GetRef<SearchPolicy>(this), inputs);
+
+  return std::make_pair(std::move(inputs), std::move(results));
+}
+
 // As an example policy, EmptyPolicy always returns a init state
 Array<State> EmptyPolicyNode::SearchOneRound() {
   Array<State> res;
