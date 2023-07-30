@@ -110,10 +110,12 @@ TVM_REGISTER_GLOBAL("auto_scheduler.SearchPolicyContinueSearchOneRound")
       return Array<ObjectRef>{inputs, results};
     });
 
-TVM_REGISTER_GLOBAL("auto_scheduler.SearchPolicyMeasureCandidates")
-    .set_body_typed([](SearchPolicy policy, Array<MeasureInput> inputs, ProgramMeasurer measurer) {
-      auto [inp, res] = policy->MeasureCandidates(inputs, measurer);
-      return Array<ObjectRef>{inp, res};
+TVM_REGISTER_GLOBAL("auto_scheduler.SearchPolicyPromoteCandidates")
+    .set_body_typed([](SearchPolicy policy, int num_promote,
+                       Array<MeasureInput> prev_inputs,
+                       Array<MeasureResult> prev_results, ProgramMeasurer measurer) {
+      auto [inputs, results] = policy->PromoteCandidates(num_promote, prev_inputs, prev_results, measurer);
+      return Array<ObjectRef>{inputs, results};
     });
 
 TVM_REGISTER_GLOBAL("auto_scheduler.SearchPolicySetVerbose")

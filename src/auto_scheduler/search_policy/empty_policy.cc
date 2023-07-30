@@ -106,9 +106,41 @@ std::pair<Array<MeasureInput>, Array<MeasureResult>> EmptyPolicyNode::ContinueSe
   return std::make_pair(std::move(inputs), std::move(results));
 }
 
-std::pair<Array<MeasureInput>, Array<MeasureResult>> EmptyPolicyNode::MeasureCandidates(
-    Array<MeasureInput> inputs, ProgramMeasurer measurer) {
+std::pair<Array<MeasureInput>, Array<MeasureResult>> EmptyPolicyNode::PromoteCandidates(
+    int num_promote, Array<MeasureInput> prev_inputs,
+    Array<MeasureResult> prev_results, ProgramMeasurer measurer) {
+
+  Array<MeasureInput> inputs;
   Array<MeasureResult> results;
+
+  using InputHeapItem = std::pair<MeasureInput, float>;
+  auto cmp = [](const InputHeapItem& left, const InputHeapItem& right) {
+    return left.second < right.second;
+  };
+  std::vector<InputHeapItem> heap;
+
+  int num_prev = prev_results.size();
+
+  for (int i = 0; i < num_prev; i++) {
+
+    std::string state_str = (prev_inputs[i]->state).ToStr();
+
+    float cost_mean = FloatArrayMean(prev_results[i]->costs);
+    if (static_cast<int>(heap.size()) < num_promote) {
+      heap.emplace_back(prev_inputs[i], cost_mean);
+      std::push_heap(heap.begin(), heap.end(), cmp);
+    } else if (cost_mean < heap.front().second) {
+      std::pop_heap(heap.begin(), heap.end(), cmp);
+      heap.back() = InputHeapItem(prev_inputs[i], cost_mean);
+      std::push_heap(heap.begin(), heap.end(), cmp);
+    }
+  }
+
+  std::sort(heap.begin(), heap.end(), cmp);
+
+  for (auto& item : heap) {
+    inputs.push_back(std::move(item.first));
+  }
 
   // Measure these states
   PrintTitle("Measure", verbose);

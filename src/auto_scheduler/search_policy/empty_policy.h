@@ -49,19 +49,20 @@ class EmptyPolicyNode : public SearchPolicyNode {
   std::pair<Array<MeasureInput>, Array<MeasureResult>> ContinueSearchOneRound(
       int num_measure, ProgramMeasurer measurer) final;
 
-  std::pair<Array<MeasureInput>, Array<MeasureResult>> MeasureCandidates(
-      Array<MeasureInput> inputs, ProgramMeasurer measurer) final;
+  std::pair<Array<MeasureInput>, Array<MeasureResult>> PromoteCandidates(
+      int num_promote, Array<MeasureInput> prev_inputs,
+      Array<MeasureResult> prev_results, ProgramMeasurer measurer) final;
 
-  static constexpr const char* _type_key = "auto_scheduler.EmptyPolicy";
-  TVM_DECLARE_FINAL_OBJECT_INFO(EmptyPolicyNode, SearchPolicyNode);
+    static constexpr const char* _type_key = "auto_scheduler.EmptyPolicy";
+    TVM_DECLARE_FINAL_OBJECT_INFO(EmptyPolicyNode, SearchPolicyNode);
 
- private:
-  /*!
-   * \brief Use a sub function to generate several candidate states in each search round.
-   * \returns The generated states
-   */
-  Array<State> SearchOneRound();
-};
+   private:
+    /*!
+     * \brief Use a sub function to generate several candidate states in each search round.
+     * \returns The generated states
+     */
+    Array<State> SearchOneRound();
+  };
 
 /*!
  * \brief Managed reference to EmptyPolicyNode.

@@ -117,8 +117,9 @@ class SketchPolicyNode : public SearchPolicyNode {
   std::pair<Array<MeasureInput>, Array<MeasureResult>> ContinueSearchOneRound(
       int num_measure, ProgramMeasurer measurer) final;
 
-  std::pair<Array<MeasureInput>, Array<MeasureResult>> MeasureCandidates(
-      Array<MeasureInput> inputs, ProgramMeasurer measurer) final;
+  std::pair<Array<MeasureInput>, Array<MeasureResult>> PromoteCandidates(
+      int num_promote, Array<MeasureInput> prev_inputs, Array<MeasureResult> prev_results,
+      ProgramMeasurer measurer) final;
 
   /*!
    * \brief Generate sketches.

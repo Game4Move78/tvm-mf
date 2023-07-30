@@ -281,10 +281,44 @@ std::pair<Array<MeasureInput>, Array<MeasureResult>> SketchPolicyNode::ContinueS
   return std::make_pair(std::move(inputs), std::move(results));
 }
 
-std::pair<Array<MeasureInput>, Array<MeasureResult>> SketchPolicyNode::MeasureCandidates(
-    Array<MeasureInput> inputs, ProgramMeasurer measurer) {
-  num_measure_per_iter_ = inputs.size();
+std::pair<Array<MeasureInput>, Array<MeasureResult>> SketchPolicyNode::PromoteCandidates(
+    int num_promote, Array<MeasureInput> prev_inputs,
+    Array<MeasureResult> prev_results, ProgramMeasurer measurer) {
+
+  Array<MeasureInput> inputs;
   Array<MeasureResult> results;
+
+  using InputHeapItem = std::pair<MeasureInput, float>;
+  auto cmp = [](const InputHeapItem& left, const InputHeapItem& right) {
+    return left.second < right.second;
+  };
+  std::vector<InputHeapItem> heap;
+
+  int num_prev = prev_results.size();
+
+  for (int i = 0; i < num_prev; i++) {
+
+    std::string state_str = (prev_inputs[i]->state).ToStr();
+
+    if (!measured_states_set_.count(state_str)) {
+      float cost_mean = FloatArrayMean(prev_results[i]->costs);
+      if (static_cast<int>(heap.size()) < num_promote) {
+        heap.emplace_back(prev_inputs[i], cost_mean);
+        std::push_heap(heap.begin(), heap.end(), cmp);
+      } else if (cost_mean < heap.front().second) {
+        std::pop_heap(heap.begin(), heap.end(), cmp);
+        heap.back() = InputHeapItem(prev_inputs[i], cost_mean);
+        std::push_heap(heap.begin(), heap.end(), cmp);
+      }
+    }
+
+  }
+
+  std::sort(heap.begin(), heap.end(), cmp);
+
+  for (auto& item : heap) {
+    inputs.push_back(std::move(item.first));
+  }
 
   // Measure candidate states
   PrintTitle("Measure", verbose);
@@ -292,8 +326,12 @@ std::pair<Array<MeasureInput>, Array<MeasureResult>> SketchPolicyNode::MeasureCa
 
   // Update measured states throughputs. These states will join the EvolutionarySearch in later
   // search rounds.
-  for (const auto& res : results) {
-    measured_states_throughputs_.push_back(1.0 / FloatArrayMean(res->costs));
+  for (int i = 0; i < results.size(); i++) {
+    const State& state = inputs[i]->state;
+    std::string state_str = state.ToStr();
+    measured_states_set_.insert(std::move(state_str));
+    measured_states_vector_.push_back(state);
+    measured_states_throughputs_.push_back(1.0 / FloatArrayMean(results[i]->costs));
   }
 
   auto t_begin = std::chrono::high_resolution_clock::now();

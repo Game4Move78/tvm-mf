@@ -118,7 +118,7 @@ class SearchPolicy(Object):
         """
         return _ffi_api.SearchPolicyContinueSearchOneRound(self, num_measure, measurer)
 
-    def measure_candidates(self, inputs, measurer):
+    def promote_candidates(self, num_promote, prev_inputs, prev_results, measurer):
         """
         Continue the search by doing an additional search round.
 
@@ -136,7 +136,7 @@ class SearchPolicy(Object):
         results: List[MeasureResult]
             The results of measurments in this search round
         """
-        return _ffi_api.SearchPolicyMeasureCandidates(self, inputs, measurer)
+        return _ffi_api.SearchPolicyPromoteCandidates(self, num_promote, prev_inputs, prev_results, measurer)
 
     def set_verbose(self, verbose):
         """

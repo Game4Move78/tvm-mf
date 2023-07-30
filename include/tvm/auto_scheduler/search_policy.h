@@ -168,8 +168,9 @@ class SearchPolicyNode : public Object {
    * \param measurer The measurer to measure programs
    * \return The measurement records for measurements in this search round
    */
-  virtual std::pair<Array<MeasureInput>, Array<MeasureResult>> MeasureCandidates(
-      Array<MeasureInput> inputs, ProgramMeasurer measurer) = 0;
+  virtual std::pair<Array<MeasureInput>, Array<MeasureResult>> PromoteCandidates(
+      int num_promote, Array<MeasureInput> prev_inputs, Array<MeasureResult> prev_results,
+      ProgramMeasurer measurer) = 0;
 
   /*!
    * \brief Preload measured states from a log file to resume the state of the search policy.
